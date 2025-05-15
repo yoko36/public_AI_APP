@@ -1,0 +1,13 @@
+numpy
+matplotlib
+pandas
+torch
+openai
+langchain-core
+langchain-community
+langchain-text-splitters
+langchain-anthropic
+langchain-chroma
+langchain-cohere
+langchain-openai
+langgraph

@@ -2,9 +2,7 @@ FROM python:3.12
 
 WORKDIR /app
 
-COPY install_package.txt .
-RUN pip install -r install_package.txt
-
 COPY app /app
+COPY install_package.txt .
 
-CMD ["python", "test.py"]
+RUN pip install --upgrade pip && pip install -r install_package.txt

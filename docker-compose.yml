@@ -1,0 +1,12 @@
+services:
+  python-ai:
+    build: .
+    container_name: test_container
+    env_file:
+      - .env
+    volumes:
+      - ./app:/app
+    working_dir: /app
+    command: ["bash"]
+    stdin_open: true
+    tty: true

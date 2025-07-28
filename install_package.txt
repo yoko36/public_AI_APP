@@ -11,3 +11,4 @@ langchain-chroma
 langchain-cohere
 langchain-openai
 langgraph
+requests

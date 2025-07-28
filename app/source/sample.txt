@@ -1,0 +1,72 @@
+[
+  {
+    "name": "田中美咲",
+    "age": 27,
+    "hobby": "ピアノ",
+    "birthplace": "東京都",
+    "occupation": "教師"
+  },
+  {
+    "name": "高橋大輔",
+    "age": 41,
+    "hobby": "釣り",
+    "birthplace": "北海道",
+    "occupation": "公務員"
+  },
+  {
+    "name": "佐藤未来",
+    "age": 25,
+    "hobby": "カフェ巡り",
+    "birthplace": "京都府",
+    "occupation": "Webデザイナー"
+  },
+  {
+    "name": "山崎健太郎",
+    "age": 34,
+    "hobby": "登山",
+    "birthplace": "長野県",
+    "occupation": "システムエンジニア"
+  },
+  {
+    "name": "マリア・ガルシア",
+    "age": 32,
+    "hobby": "読書",
+    "birthplace": "スペイン・マドリード",
+    "occupation": "翻訳家"
+  },
+  {
+    "name": "李翔",
+    "age": 30,
+    "hobby": "写真撮影",
+    "birthplace": "中国・上海",
+    "occupation": "旅行ガイド"
+  },
+  {
+    "name": "json smith",
+    "age": 29,
+    "hobby": "映画鑑賞",
+    "birthplace": "カリフォルニア州",
+    "occupation": "データサイエンティスト"
+  },
+  {
+    "name": "アンナ・クラーク",
+    "age": 38,
+    "hobby": "陶芸",
+    "birthplace": "イギリス・ロンドン",
+    "occupation": "美術教師"
+  },
+  {
+    "name": "小林涼",
+    "age": 22,
+    "hobby": "ゲーム",
+    "birthplace": "大阪府",
+    "occupation": "大学生"
+  },
+  {
+    "name": "エマ・ジョンソン",
+    "age": 36,
+    "hobby": "ランニング",
+    "birthplace": "ニューヨーク州",
+    "occupation": "マーケティングマネージャー"
+  }
+]

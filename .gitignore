@@ -1,2 +1,3 @@
 .env
-app/chroma_db
+**/chroma_db/
+frontend_app/node_modules

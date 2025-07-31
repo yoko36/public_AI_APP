@@ -1,0 +1,727 @@
+/*! tailwindcss v4.1.11 | MIT License | https://tailwindcss.com */
+@layer properties {
+    @supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))) {
+
+        *,
+        :before,
+        :after,
+        ::backdrop {
+            --tw-translate-x: 0;
+            --tw-translate-y: 0;
+            --tw-translate-z: 0;
+            --tw-border-style: solid;
+            --tw-leading: initial;
+            --tw-shadow: 0 0 #0000;
+            --tw-shadow-color: initial;
+            --tw-shadow-alpha: 100%;
+            --tw-inset-shadow: 0 0 #0000;
+            --tw-inset-shadow-color: initial;
+            --tw-inset-shadow-alpha: 100%;
+            --tw-ring-color: initial;
+            --tw-ring-shadow: 0 0 #0000;
+            --tw-inset-ring-color: initial;
+            --tw-inset-ring-shadow: 0 0 #0000;
+            --tw-ring-inset: initial;
+            --tw-ring-offset-width: 0px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-offset-shadow: 0 0 #0000;
+            --tw-outline-style: solid
+        }
+    }
+}
+
+.\@container\/card-header {
+    container: card-header/inline-size
+}
+
+.fixed {
+    position: fixed
+}
+
+.left-1\/2 {
+    left: 50%
+}
+
+.z-50 {
+    z-index: 50
+}
+
+.col-start-2 {
+    grid-column-start: 2
+}
+
+.row-span-2 {
+    grid-row: span 2/span 2
+}
+
+.row-start-1 {
+    grid-row-start: 1
+}
+
+.mx-auto {
+    margin-inline: auto
+}
+
+.flex {
+    display: flex
+}
+
+.grid {
+    display: grid
+}
+
+.inline-flex {
+    display: inline-flex
+}
+
+.h-screen {
+    height: 100vh
+}
+
+.min-h-screen {
+    min-height: 100vh
+}
+
+.w-\[min\(100\%-1rem\,48rem\)\] {
+    width: min(100% - 1rem, 48rem)
+}
+
+.w-full {
+    width: 100%
+}
+
+.max-w-\[68ch\] {
+    max-width: 68ch
+}
+
+.flex-1 {
+    flex: 1
+}
+
+.shrink-0 {
+    flex-shrink: 0
+}
+
+.-translate-x-1\/2 {
+    --tw-translate-x: calc(calc(1/2*100%)*-1);
+    translate: var(--tw-translate-x)var(--tw-translate-y)
+}
+
+.auto-rows-min {
+    grid-auto-rows: min-content
+}
+
+.grid-rows-\[auto_auto\] {
+    grid-template-rows: auto auto
+}
+
+.flex-col {
+    flex-direction: column
+}
+
+.items-center {
+    align-items: center
+}
+
+.items-start {
+    align-items: flex-start
+}
+
+.justify-center {
+    justify-content: center
+}
+
+.justify-end {
+    justify-content: flex-end
+}
+
+.justify-start {
+    justify-content: flex-start
+}
+
+.self-start {
+    align-self: flex-start
+}
+
+.justify-self-end {
+    justify-self: flex-end
+}
+
+.overflow-y-auto {
+    overflow-y: auto
+}
+
+.rounded-full {
+    border-radius: 3.40282e38px
+}
+
+.rounded-md {
+    border-radius: calc(var(--radius) - 2px)
+}
+
+.rounded-xl {
+    border-radius: calc(var(--radius) + 4px)
+}
+
+.border {
+    border-style: var(--tw-border-style);
+    border-width: 1px
+}
+
+.border-b {
+    border-bottom-style: var(--tw-border-style);
+    border-bottom-width: 1px
+}
+
+.border-input {
+    border-color: var(--input)
+}
+
+.bg-background,
+.bg-background\/90 {
+    background-color: var(--background)
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+    .bg-background\/90 {
+        background-color: color-mix(in oklab, var(--background)90%, transparent)
+    }
+}
+
+.bg-card {
+    background-color: var(--card)
+}
+
+.bg-destructive {
+    background-color: var(--destructive)
+}
+
+.bg-muted\/40 {
+    background-color: var(--muted)
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+    .bg-muted\/40 {
+        background-color: color-mix(in oklab, var(--muted)40%, transparent)
+    }
+}
+
+.bg-primary {
+    background-color: var(--primary)
+}
+
+.bg-secondary {
+    background-color: var(--secondary)
+}
+
+.bg-transparent {
+    background-color: #0000
+}
+
+.text-center {
+    text-align: center
+}
+
+.leading-none {
+    --tw-leading: 1;
+    line-height: 1
+}
+
+.\[overflow-wrap\:anywhere\] {
+    overflow-wrap: anywhere
+}
+
+.break-words {
+    overflow-wrap: break-word
+}
+
+.whitespace-nowrap {
+    white-space: nowrap
+}
+
+.whitespace-pre-wrap {
+    white-space: pre-wrap
+}
+
+.text-card-foreground {
+    color: var(--card-foreground)
+}
+
+.text-foreground {
+    color: var(--foreground)
+}
+
+.text-muted-foreground {
+    color: var(--muted-foreground)
+}
+
+.text-primary {
+    color: var(--primary)
+}
+
+.text-primary-foreground {
+    color: var(--primary-foreground)
+}
+
+.text-secondary-foreground {
+    color: var(--secondary-foreground)
+}
+
+.underline-offset-4 {
+    text-underline-offset: 4px
+}
+
+.antialiased {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale
+}
+
+.ring {
+    --tw-ring-shadow: var(--tw-ring-inset, )0 0 0 calc(1px + var(--tw-ring-offset-width))var(--tw-ring-color, currentcolor);
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)
+}
+
+.outline {
+    outline-style: var(--tw-outline-style);
+    outline-width: 1px
+}
+
+.transition-\[color\,box-shadow\] {
+    transition-property: color, box-shadow;
+    transition-timing-function: var(--tw-ease, ease);
+    transition-duration: var(--tw-duration, 0s)
+}
+
+.transition-all {
+    transition-property: all;
+    transition-timing-function: var(--tw-ease, ease);
+    transition-duration: var(--tw-duration, 0s)
+}
+
+.outline-none {
+    --tw-outline-style: none;
+    outline-style: none
+}
+
+.selection\:bg-primary ::selection {
+    background-color: var(--primary)
+}
+
+.selection\:bg-primary::selection {
+    background-color: var(--primary)
+}
+
+.selection\:text-primary-foreground ::selection {
+    color: var(--primary-foreground)
+}
+
+.selection\:text-primary-foreground::selection {
+    color: var(--primary-foreground)
+}
+
+.file\:inline-flex::file-selector-button {
+    display: inline-flex
+}
+
+.file\:border-0::file-selector-button {
+    border-style: var(--tw-border-style);
+    border-width: 0
+}
+
+.file\:bg-transparent::file-selector-button {
+    background-color: #0000
+}
+
+.file\:text-foreground::file-selector-button {
+    color: var(--foreground)
+}
+
+.placeholder\:text-muted-foreground::placeholder {
+    color: var(--muted-foreground)
+}
+
+@media (hover:hover) {
+    .hover\:bg-accent:hover {
+        background-color: var(--accent)
+    }
+
+    .hover\:bg-destructive\/90:hover {
+        background-color: var(--destructive)
+    }
+
+    @supports (color:color-mix(in lab, red, red)) {
+        .hover\:bg-destructive\/90:hover {
+            background-color: color-mix(in oklab, var(--destructive)90%, transparent)
+        }
+    }
+
+    .hover\:bg-primary\/90:hover {
+        background-color: var(--primary)
+    }
+
+    @supports (color:color-mix(in lab, red, red)) {
+        .hover\:bg-primary\/90:hover {
+            background-color: color-mix(in oklab, var(--primary)90%, transparent)
+        }
+    }
+
+    .hover\:bg-secondary\/80:hover {
+        background-color: var(--secondary)
+    }
+
+    @supports (color:color-mix(in lab, red, red)) {
+        .hover\:bg-secondary\/80:hover {
+            background-color: color-mix(in oklab, var(--secondary)80%, transparent)
+        }
+    }
+
+    .hover\:text-accent-foreground:hover {
+        color: var(--accent-foreground)
+    }
+
+    .hover\:underline:hover {
+        text-decoration-line: underline
+    }
+}
+
+.focus-visible\:border-ring:focus-visible {
+    border-color: var(--ring)
+}
+
+.focus-visible\:ring-\[3px\]:focus-visible {
+    --tw-ring-shadow: var(--tw-ring-inset, )0 0 0 calc(3px + var(--tw-ring-offset-width))var(--tw-ring-color, currentcolor);
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)
+}
+
+.focus-visible\:ring-destructive\/20:focus-visible {
+    --tw-ring-color: var(--destructive)
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+    .focus-visible\:ring-destructive\/20:focus-visible {
+        --tw-ring-color: color-mix(in oklab, var(--destructive)20%, transparent)
+    }
+}
+
+.focus-visible\:ring-ring\/50:focus-visible {
+    --tw-ring-color: var(--ring)
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+    .focus-visible\:ring-ring\/50:focus-visible {
+        --tw-ring-color: color-mix(in oklab, var(--ring)50%, transparent)
+    }
+}
+
+.disabled\:pointer-events-none:disabled {
+    pointer-events: none
+}
+
+.disabled\:cursor-not-allowed:disabled {
+    cursor: not-allowed
+}
+
+.disabled\:opacity-50:disabled {
+    opacity: .5
+}
+
+.has-data-\[slot\=card-action\]\:grid-cols-\[1fr_auto\]:has([data-slot=card-action]) {
+    grid-template-columns: 1fr auto
+}
+
+.aria-invalid\:border-destructive[aria-invalid=true] {
+    border-color: var(--destructive)
+}
+
+.aria-invalid\:ring-destructive\/20[aria-invalid=true] {
+    --tw-ring-color: var(--destructive)
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+    .aria-invalid\:ring-destructive\/20[aria-invalid=true] {
+        --tw-ring-color: color-mix(in oklab, var(--destructive)20%, transparent)
+    }
+}
+
+.dark\:border-input:is(.dark *) {
+    border-color: var(--input)
+}
+
+.dark\:bg-destructive\/60:is(.dark *) {
+    background-color: var(--destructive)
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+    .dark\:bg-destructive\/60:is(.dark *) {
+        background-color: color-mix(in oklab, var(--destructive)60%, transparent)
+    }
+}
+
+.dark\:bg-input\/30:is(.dark *) {
+    background-color: var(--input)
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+    .dark\:bg-input\/30:is(.dark *) {
+        background-color: color-mix(in oklab, var(--input)30%, transparent)
+    }
+}
+
+@media (hover:hover) {
+    .dark\:hover\:bg-accent\/50:is(.dark *):hover {
+        background-color: var(--accent)
+    }
+
+    @supports (color:color-mix(in lab, red, red)) {
+        .dark\:hover\:bg-accent\/50:is(.dark *):hover {
+            background-color: color-mix(in oklab, var(--accent)50%, transparent)
+        }
+    }
+
+    .dark\:hover\:bg-input\/50:is(.dark *):hover {
+        background-color: var(--input)
+    }
+
+    @supports (color:color-mix(in lab, red, red)) {
+        .dark\:hover\:bg-input\/50:is(.dark *):hover {
+            background-color: color-mix(in oklab, var(--input)50%, transparent)
+        }
+    }
+}
+
+.dark\:focus-visible\:ring-destructive\/40:is(.dark *):focus-visible {
+    --tw-ring-color: var(--destructive)
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+    .dark\:focus-visible\:ring-destructive\/40:is(.dark *):focus-visible {
+        --tw-ring-color: color-mix(in oklab, var(--destructive)40%, transparent)
+    }
+}
+
+.dark\:aria-invalid\:ring-destructive\/40:is(.dark *)[aria-invalid=true] {
+    --tw-ring-color: var(--destructive)
+}
+
+@supports (color:color-mix(in lab, red, red)) {
+    .dark\:aria-invalid\:ring-destructive\/40:is(.dark *)[aria-invalid=true] {
+        --tw-ring-color: color-mix(in oklab, var(--destructive)40%, transparent)
+    }
+}
+
+.\[\&_svg\]\:pointer-events-none svg {
+    pointer-events: none
+}
+
+.\[\&_svg\]\:shrink-0 svg {
+    flex-shrink: 0
+}
+
+:root,
+:host {
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px)
+}
+
+:root {
+    --radius: .625rem;
+    --background: oklch(100% 0 0);
+    --foreground: oklch(12.9% .042 264.695);
+    --card: oklch(100% 0 0);
+    --card-foreground: oklch(12.9% .042 264.695);
+    --popover: oklch(100% 0 0);
+    --popover-foreground: oklch(12.9% .042 264.695);
+    --primary: oklch(20.8% .042 265.755);
+    --primary-foreground: oklch(98.4% .003 247.858);
+    --secondary: oklch(96.8% .007 247.896);
+    --secondary-foreground: oklch(20.8% .042 265.755);
+    --muted: oklch(96.8% .007 247.896);
+    --muted-foreground: oklch(55.4% .046 257.417);
+    --accent: oklch(96.8% .007 247.896);
+    --accent-foreground: oklch(20.8% .042 265.755);
+    --destructive: oklch(57.7% .245 27.325);
+    --border: oklch(92.9% .013 255.508);
+    --input: oklch(92.9% .013 255.508);
+    --ring: oklch(70.4% .04 256.788);
+    --chart-1: oklch(64.6% .222 41.116);
+    --chart-2: oklch(60% .118 184.704);
+    --chart-3: oklch(39.8% .07 227.392);
+    --chart-4: oklch(82.8% .189 84.429);
+    --chart-5: oklch(76.9% .188 70.08);
+    --sidebar: oklch(98.4% .003 247.858);
+    --sidebar-foreground: oklch(12.9% .042 264.695);
+    --sidebar-primary: oklch(20.8% .042 265.755);
+    --sidebar-primary-foreground: oklch(98.4% .003 247.858);
+    --sidebar-accent: oklch(96.8% .007 247.896);
+    --sidebar-accent-foreground: oklch(20.8% .042 265.755);
+    --sidebar-border: oklch(92.9% .013 255.508);
+    --sidebar-ring: oklch(70.4% .04 256.788)
+}
+
+.dark {
+    --background: oklch(12.9% .042 264.695);
+    --foreground: oklch(98.4% .003 247.858);
+    --card: oklch(20.8% .042 265.755);
+    --card-foreground: oklch(98.4% .003 247.858);
+    --popover: oklch(20.8% .042 265.755);
+    --popover-foreground: oklch(98.4% .003 247.858);
+    --primary: oklch(92.9% .013 255.508);
+    --primary-foreground: oklch(20.8% .042 265.755);
+    --secondary: oklch(27.9% .041 260.031);
+    --secondary-foreground: oklch(98.4% .003 247.858);
+    --muted: oklch(27.9% .041 260.031);
+    --muted-foreground: oklch(70.4% .04 256.788);
+    --accent: oklch(27.9% .041 260.031);
+    --accent-foreground: oklch(98.4% .003 247.858);
+    --destructive: oklch(70.4% .191 22.216);
+    --border: oklch(100% 0 0/.1);
+    --input: oklch(100% 0 0/.15);
+    --ring: oklch(55.1% .027 264.364);
+    --chart-1: oklch(48.8% .243 264.376);
+    --chart-2: oklch(69.6% .17 162.48);
+    --chart-3: oklch(76.9% .188 70.08);
+    --chart-4: oklch(62.7% .265 303.9);
+    --chart-5: oklch(64.5% .246 16.439);
+    --sidebar: oklch(20.8% .042 265.755);
+    --sidebar-foreground: oklch(98.4% .003 247.858);
+    --sidebar-primary: oklch(48.8% .243 264.376);
+    --sidebar-primary-foreground: oklch(98.4% .003 247.858);
+    --sidebar-accent: oklch(27.9% .041 260.031);
+    --sidebar-accent-foreground: oklch(98.4% .003 247.858);
+    --sidebar-border: oklch(100% 0 0/.1);
+    --sidebar-ring: oklch(55.1% .027 264.364)
+}
+
+@layer base {
+    * {
+        border-color: var(--border);
+        outline-color: var(--ring)
+    }
+
+    @supports (color:color-mix(in lab, red, red)) {
+        * {
+            outline-color: color-mix(in oklab, var(--ring)50%, transparent)
+        }
+    }
+
+    body {
+        background-color: var(--background);
+        color: var(--foreground)
+    }
+}
+
+@property --tw-translate-x {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0
+}
+
+@property --tw-translate-y {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0
+}
+
+@property --tw-translate-z {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0
+}
+
+@property --tw-border-style {
+    syntax: "*";
+    inherits: false;
+    initial-value: solid
+}
+
+@property --tw-leading {
+    syntax: "*";
+    inherits: false
+}
+
+@property --tw-shadow {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0 0 #0000
+}
+
+@property --tw-shadow-color {
+    syntax: "*";
+    inherits: false
+}
+
+@property --tw-shadow-alpha {
+    syntax: "<percentage>";
+    inherits: false;
+    initial-value: 100%
+}
+
+@property --tw-inset-shadow {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0 0 #0000
+}
+
+@property --tw-inset-shadow-color {
+    syntax: "*";
+    inherits: false
+}
+
+@property --tw-inset-shadow-alpha {
+    syntax: "<percentage>";
+    inherits: false;
+    initial-value: 100%
+}
+
+@property --tw-ring-color {
+    syntax: "*";
+    inherits: false
+}
+
+@property --tw-ring-shadow {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0 0 #0000
+}
+
+@property --tw-inset-ring-color {
+    syntax: "*";
+    inherits: false
+}
+
+@property --tw-inset-ring-shadow {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0 0 #0000
+}
+
+@property --tw-ring-inset {
+    syntax: "*";
+    inherits: false
+}
+
+@property --tw-ring-offset-width {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0
+}
+
+@property --tw-ring-offset-color {
+    syntax: "*";
+    inherits: false;
+    initial-value: #fff
+}
+
+@property --tw-ring-offset-shadow {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0 0 #0000
+}
+
+@property --tw-outline-style {
+    syntax: "*";
+    inherits: false;
+    initial-value: solid
+}

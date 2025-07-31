@@ -1,12 +1,29 @@
 services:
-  python-ai:
-    build: .
-    container_name: test_container
+  chatbot:
+    build: 
+      context: ./backend_app
+    container_name: chatbot_container
     env_file:
       - .env
     volumes:
-      - ./app:/app
+      - ./backend_app/app:/app
     working_dir: /app
     command: ["bash"]
     stdin_open: true
     tty: true
+    ports:
+      - "8000:8000"
+
+  interface:
+    build:
+      context: ./frontend_app
+    container_name: web_interface_container
+    volumes:
+      - ./frontend_app:/app
+      - /frontend_app/node_modules
+    environment:
+      - NODE_ENV=development
+    stdin_open: true
+    tty: true
+    ports:
+      - "3000:3000"

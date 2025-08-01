@@ -30,7 +30,7 @@ export default function ChatPage({ projectId }: { projectId: string }) {
         setLoading(true);
 
         try {
-            const res = await fetch(`/api/chat`, {
+            const res = await fetch('/api-route/chat', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ projectId, messages: [...messages, userMessage] }),

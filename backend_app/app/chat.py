@@ -17,7 +17,9 @@ from langchain_community.document_loaders import TextLoader
 from langchain_community.document_loaders import WebBaseLoader
 
 # 別ファイルからのメソッド読み出し
-from create_documents.search_gitlab import load_gitlab_wiki # 引数(target: str, repository_name: str, token: str): ドキュメントのリストを出力
+from create_documents.search_gitlab import (
+    load_gitlab_wiki,
+)  # 引数(target: str, repository_name: str, token: str): ドキュメントのリストを出力
 
 # プロンプト読み込み
 with open("./prompt.txt", "r") as f:
@@ -39,15 +41,18 @@ model = GPT4o
 
 # HyDEの実装
 # 検索に使用するRAG機能なしの回答を出力
-hypothetical_prompt = ChatPromptTemplate.from_template("""\
+hypothetical_prompt = ChatPromptTemplate.from_template(
+    """\
  次の質問に回答する一文を書いてください。
 
  質問: {question}
- """)
+ """
+)
 # chainの作成
 hypothetical_chain = hypothetical_prompt | model | StrOutputParser()
 
-prompt = ChatPromptTemplate.from_template('''\
+prompt = ChatPromptTemplate.from_template(
+    '''\
  以下の文脈だけを踏まえて質問に回答してください。
 
  文脈: """
@@ -55,12 +60,20 @@ prompt = ChatPromptTemplate.from_template('''\
  """
 
  質問: {question}
- ''')
+ '''
+)
 
-chain = RunnableParallel({
-    "question": RunnablePassthrough(),
-    "context": hypothetical_chain | retrieve_context,
-}) | prompt | model | StrOutputParser()
+chain = (
+    RunnableParallel(
+        {
+            "question": RunnablePassthrough(),
+            "context": hypothetical_chain | retrieve_context,
+        }
+    )
+    | prompt
+    | model
+    | StrOutputParser()
+)
 
 response = chain.invoke(text)
 print("response: ", response)

@@ -2,6 +2,7 @@ numpy
 matplotlib
 pandas
 torch
+
 openai
 langchain-core
 langchain-community
@@ -12,3 +13,6 @@ langchain-cohere
 langchain-openai
 langgraph
 requests
+
+fastapi 
+uvicorn

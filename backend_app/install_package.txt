@@ -16,3 +16,6 @@ requests
 
 fastapi 
 uvicorn
+
+slack_bolt
+slack_sdk

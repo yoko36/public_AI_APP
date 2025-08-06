@@ -1,3 +1,5 @@
+import os
+
 # Pythonのデータ型ヒントを定義するモジュール
 from typing import List, Literal, Optional
 
@@ -10,8 +12,9 @@ import asyncio, inspect
 # fastAPIの読み込み
 from fastapi import FastAPI, HTTPException
 
-# あなたの関数（同期でも非同期でもOK）
+# チャットシステムの呼び出し
 from chatbot import chat_to_chatbot  # question: str -> str  を想定
+from chatagent import chat_to_agent  # question: str -> str  を想定
 
 # ---- 入出力スキーマ ----
 Role = Literal["user", "assistant", "system"]
@@ -39,8 +42,9 @@ def health():
     return {"status": "ok"}
 
 
+# チャットボット用リクエスト受付
 @app.post("/api/chatbot", response_model=ChatResponse)
-async def chat(req: ChatRequest):  # postメソッドの定義
+async def res_chatbot(req: ChatRequest):  # postメソッドの定義
     # 最後の user メッセージを取り出す
     last_user = next(
         (m.content for m in reversed(req.messages) if m.role == "user"), None
@@ -48,7 +52,7 @@ async def chat(req: ChatRequest):  # postメソッドの定義
     if not last_user:
         raise HTTPException(status_code=400, detail="no user message found")
 
-    # chat_to_chatbot が sync/async どちらでも動くように分岐
+    # chat_to_chatbot が 同期/非同期 どちらでも動くようにする
     try:
         if inspect.iscoroutinefunction(chat_to_chatbot):
             reply = await chat_to_chatbot(last_user)  # async 関数の場合
@@ -58,7 +62,32 @@ async def chat(req: ChatRequest):  # postメソッドの定義
                 None, chat_to_chatbot, last_user
             )  # sync 関数をスレッドで実行
     except Exception as e:
-        # 予期せぬエラーを500で返す
+        # エラー処理
+        raise HTTPException(status_code=500, detail=str(e))
+
+    return ChatResponse(reply=reply)
+
+
+# agent用リクエスト受付
+@app.post("/api/agent", response_model=ChatResponse)
+async def res_agent(req: ChatRequest):  # postメソッドの定義
+    # 最後の user メッセージを取り出す
+    last_user = next(
+        (m.content for m in reversed(req.messages) if m.role == "user"), None
+    )
+    if not last_user:
+        raise HTTPException(status_code=400, detail="no user message found")
+
+    try:
+        if inspect.iscoroutinefunction(chat_to_agent):
+            reply = await chat_to_agent(last_user)  # async 関数の場合
+        else:
+            loop = asyncio.get_running_loop()
+            reply = await loop.run_in_executor(
+                None, chat_to_agent, last_user
+            )  # sync 関数をスレッドで実行
+    except Exception as e:
+        # エラー処理
         raise HTTPException(status_code=500, detail=str(e))
 
     return ChatResponse(reply=reply)

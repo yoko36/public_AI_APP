@@ -26,7 +26,7 @@ from create_documents.search_gitlab import (
 #     text = f.read()
 
 
-def chat_to_chatbot(input_prompt: str) -> str:
+def chat_to_agent(input_prompt: str) -> str:
     # 埋め込みベクトルの復元に使用するモジュール
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
     # DBから取得

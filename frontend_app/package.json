@@ -7,17 +7,30 @@
         "start": "next start"
     },
     "dependencies": {
+        "@radix-ui/react-accordion": "^1.2.11",
+        "@radix-ui/react-dialog": "^1.1.14",
         "@radix-ui/react-slot": "^1.2.3",
+        "@radix-ui/react-tooltip": "^1.2.8",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
+        "highlight.js": "^11.9.0",
+        "katex": "^0.16.10",
         "lucide-react": "^0.356.0",
         "next": "14.0.0",
         "react": "18.2.0",
         "react-dom": "18.2.0",
+        "react-markdown": "^9.0.0",
+        "rehype-highlight": "^6.0.0",
+        "rehype-katex": "^7.0.0",
+        "remark-emoji": "^5.0.1",
+        "remark-gfm": "^4.0.0",
+        "remark-math": "^6.0.0",
         "tailwind-merge": "^3.3.1",
-        "tailwind-variants": "^0.2.1"
+        "tailwind-variants": "^0.2.1",
+        "zustand": "~5.0.7"
     },
     "devDependencies": {
+        "@tailwindcss/typography": "^0.5.16",
         "@types/node": "24.1.0",
         "@types/react": "19.1.8",
         "autoprefixer": "^10.4.21",

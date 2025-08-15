@@ -4,7 +4,9 @@ import { useParams } from "next/navigation";
 import ChatPage from "@/components/custom_ui/chat-page";
 
 export default function ChatProjectPage() {
-  const { projectId } = useParams();
+  const params = useParams();
+  // const userId = params.userId as string;
+  const threadId = params.threadId as string;
 
-  return <ChatPage projectId={projectId as string} />;
+  return <ChatPage threadId={threadId} />;
 }

@@ -1,4 +1,7 @@
 import "../styles/globals.css";
+// マークダウンのコンパイラ(?)を追加
+import "highlight.js/styles/github.css";
+import "katex/dist/katex.min.css";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

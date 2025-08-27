@@ -52,7 +52,7 @@ export function Sidebar() {
   // チャットボタンを押して際のページ遷移
   const navigateToPage = (threadId: string) => {
     selectThread(threadId);
-    router.push(`/chat-page/${encodeURIComponent(threadId)}`);
+    router.push(`/me/chat-page/${encodeURIComponent(threadId)}`);
     // 最終的
     // router.push(`/${encodeURIComponent(userId)}/chat-page/${encodeURIComponent(threadId)}`);
   };

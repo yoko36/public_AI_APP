@@ -16,7 +16,6 @@ import { AppRail } from "@/components/custom_ui/app-rail";
 // 状態管理
 import { useStore, Message } from "@/store/state"
 
-
 export default function ChatPage({ threadId }: { threadId: string }) {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
@@ -35,6 +34,12 @@ export default function ChatPage({ threadId }: { threadId: string }) {
     );
     const createMessage = useStore((s) => s.createMessage);
     const selectThread = useStore((s) => s.selectThread);
+    
+    // 終了の合図の判定を行う関数
+    const isTerminalToken = (s: string) => {    
+        const t = s.trim();
+        return t === "[DONE]" || t.toLowerCase() === "done" || t.toLowerCase() === "end";   
+    };
 
     // 表示中のスレッドを設定(プロジェクトも同様)
     useEffect(() => {
@@ -46,46 +51,151 @@ export default function ChatPage({ threadId }: { threadId: string }) {
         endRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
+    const draftIdRef = useRef<string | null>(null);
+    const controllerRef = useRef<AbortController | null>(null);
+
     // チャットを送信する関数
     const handleSend = async () => {
+        // inputの空文字を削除
         const content = input.trim();
         if (!content || !threadId) return;
 
+        // 入力を削除し、ローディング中の設定
         setInput("");
         setLoading(true);
 
-        // ユーザーメッセージを即時反映
-        createMessage(content, threadId, "user");
+        // ユーザーの発言を即時に反映(zustandのstateを更新)
+        useStore.getState().createMessage(content, threadId, "user");
+
+        // 履歴は「assistant下書き」を作る前に生成（空assistantが混ざらない）
+        {
+            // ThreadIdからMessage集合(history)を取得(ThreadId -> MessageIdテーブル -> history)
+            const s = useStore.getState();
+            const ids = s.messageIdsByThreadId[threadId] ?? [];
+            var history = ids
+                .map((id) => s.messagesById[id])
+                .filter((m): m is Message => m != null)         // Message型かつnullを除去
+                .map((m) => ({ role: m.role, content: m.content }));
+        }
+
+        // 空の assistant 下書きを作成して、そのIDを ref に保存
+        {
+            const s = useStore.getState();
+            const nextId = String(s.messageCounter);                // 次に発番されるIDを先取り(返答が返ってきた後に書き換えられるように宛先をメモ)
+            s.createMessage("送信中", threadId, "assistant");        // 送信中というメッセージを持った仮の返答文を定義(UXの問題)
+            draftIdRef.current = nextId;                            // ← catch文からでも読めるようにnextIdとは別で保存
+        }
+
+        // SSE(Server Sent Events) 開始
+        const controller = new AbortController();                   // 途中終了のボタンを設定
+        controllerRef.current = controller;
 
         try {
-            // サーバへ送信（roleとcontentを渡す）
-            const state = useStore.getState();
-            const ids = state.messageIdsByThreadId[threadId] ?? [];
-            const history = ids
-                .map((id) => state.messagesById[id])
-                .filter((m): m is Message => m != null)                 // Messageに型を固定する
-                .map((m) => ({ role: m.role, content: m.content }));
-
+            console.log("[SSE] POST /api-route/chat 開始");
             const res = await fetch("/api-route/chat", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ threadId, messages: history }),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "text/event-stream",
+                },
+                body: JSON.stringify({ threadId, messages: history }),  // JSON形式で送信
+                signal: controller.signal,                              // これを入れると進行中のSSEを即座に中断できる(controller.abort()を呼ぶ)
+                cache: "no-store",
             });
 
-            if (!res.ok) throw new Error("chat api failed");
+            console.log("[SSE] status:", res.status, "ct:", res.headers.get("content-type"));
 
-            const data = await res.json();
-            const replyText: string = data.reply ?? "…";
+            // ================================================================================================
+            // 通信エラーハンドリング
+            // ================================================================================================
+            if (!res.ok) {
+                // ここでサーバのエラーメッセージ本文を拾っておく
+                const errText = await res.text().catch(() => "(no body)");
+                console.error("[SSE] 非200応答:", res.status, errText);
+                throw new Error(`stream start failed: ${res.status} ${errText}`);
+            }
+            if (!res.body) {
+                console.error("[SSE] Response.body が null");
+                throw new Error("stream start failed: no body");
+            }
 
-            // 返答を反映
-            createMessage(replyText, threadId, "assistant");
+
+            const reader = res.body.getReader();                // リクエストボディから文字単位で読みだすことができるリーダを取得できる
+            const decoder = new TextDecoder("utf-8");           // バイナリ -> utf-8に認識を変える(何かデータを変換したわけではなくこのバイナリはutf-8だという認識を与える)
+            let draft = "";                                     // サーバから送られてくるばらばらのテキストを入れる変数
+            let buffer = "";                                    // ネットワークの都合によりチャンクの区切りに関係なく区切られることがあるため、一時保存するためのバッファ(すべての返信データはここに保存され、区切り"\n\nが来てから抜き出す"")
+
+            // 回答が終わるまでstream通信を受け取る
+            while (true) {
+                const { value, done } = await reader.read();    // ストリームが終了するまでvalueにボディからデータを取得し、終了後done: trueが返る
+                if (done) break;                                // done: trueで終了
+
+                // utf-8の文字列をテキストに変換する
+                const chunk = decoder.decode(value, { stream: true });  // streamはutf-8がマルチバイトの文字コードであるため、データの区切りでぶった切られて文字化けすることを防ぐことために使用
+                // 受け取った生チャンクもログ（最初の100文字だけ）
+                console.log("[SSE] chunk(raw):", chunk.slice(0, 100).replace(/\n/g, "\\n"));
+
+                buffer += chunk;                                        // チャンクをバッファに加えていく
+                const events = buffer.split("\n\n");                    // 区切りまでのデータを抜き出す
+                buffer = events.pop() ?? "";                            // 受信したチャンクな中に区切りが含まれない場合や区切りの後にもデータが存在する場合は端数をまたbufferに格納する
+
+                // 完成したストリーミングデータを順に処理し、UIに表示する
+                for (const ev of events) {
+                    if (!ev || ev.startsWith(":")) continue;        // 空行列やSSEのコメント(":"で始まるものはコメントとみなす)を無視
+
+                    const lines = ev.split("\n");                   // 一行ずつにする
+                    for (const line of lines) {
+                        if (!line.startsWith("data:")) continue;    // data行以外はスキップ
+                        const payload = line.slice(5).trim();       // data行は"data:"で始まるため、先頭5文字を切り捨て残りを実データとして扱う
+                        if (!payload) continue;                     // 空のデータ行はスキップ
+
+                        try {
+                            const msg = JSON.parse(payload);        // JSONとして解釈させる
+                            // メッセージタイプがチャンクかつメッセージの差分が文字列である場合に
+                            if (msg.type === "chunk" && typeof msg.delta === "string") {
+                                draft += msg.delta;                 // メッセージ全体に差分を追加
+                                const id = draftIdRef.current;      // 保存しておいた仮のIDを取得
+                                if (id) useStore.getState().updateMessage(id, draft);   // zustandの状態を最新のメッセージに更新(threadIdで指定したスレッドのメッセージを更新)
+                                // 受信終了
+                            } else if (msg.type === "end") {
+                                console.log("[SSE] end 受信");
+                                // エラーハンドリング
+                            } else if (msg.type === "error") {
+                                console.error("[SSE] server error:", msg.message);
+                                throw new Error(String(msg.message || "server error"));
+                            }
+                        } catch {
+                            // ③ 終了を表すデータを受け取った場合終了する
+                            if (isTerminalToken(payload)) {
+                                // 終了トークンは無視して本文に追加しない
+                                continue;
+                            }
+                            // data行がJSON形式ではないデータだった場合(文字列が来たときなど)
+                            draft += payload;                                       // テキストをそのままメッセージに差分として追加
+                            const id = draftIdRef.current;                          // JSONの場合と同様
+                            if (id) useStore.getState().updateMessage(id, draft);   // JSONの場合と同様
+                        }
+                    }
+                }
+            }
         } catch (e) {
-            // エラー時もメッセージで通知
-            createMessage("エラーが発生しました。もう一度お試しください。", threadId, "assistant");
+            // ストリーム時のエラーハンドリング
+            console.error("[SSE] 例外:", e);
+            const id = draftIdRef.current;
+            const s = useStore.getState();
+            const msg = "ストリーム中にエラーが発生しました。もう一度お試しください。";
+            if (id && s.messagesById[id]) s.updateMessage(id, msg);
+            else /* s.createMessage(msg, threadId, "assistant"); */ { }
         } finally {
-            setLoading(false);
+            // 通信の最後に後始末を行う
+            try { controller.abort(); } catch { }   // 通信を即座に終了させる
+            controllerRef.current = null;           // 強制終了機能は通信ごとに用意するので、古いものは削除
+            draftIdRef.current = null;              // ストリーミング形式でメッセージを作成する際に使用した下書きを削除
+            setLoading(false);                      // 通信終了
         }
+
     };
+
     // ファイルをアップロードする関数
     // const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     //     const file = e.target.files?.[0];

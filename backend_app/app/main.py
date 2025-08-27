@@ -151,13 +151,13 @@ async def res_chatbot(req: ChatRequest):
             yield sse({"type": "error", "message": str(e)})
             return
         finally:
-            # Nginx等のアイドル切断対策：必要ならハートビートを入れる
+            # Nginx等のアイドル切断の対策としてハートビートを入れる
             # yield b":heartbeat\n\n"
             ...
 
         # 正常終了
-        yield sse({"type": "end"})
-        yield sse("done", event="done")
+        yield sse({"type": "end"})  # 終了の合図を送信
+        yield sse("done", event="done")  # done(終了)イベント行を作成
 
     headers = {
         "Content-Type": "text/event-stream",
@@ -165,6 +165,7 @@ async def res_chatbot(req: ChatRequest):
         "Connection": "keep-alive",
         "X-Accel-Buffering": "no",  # nginx のバッファリング抑止
     }
+    # ストリーミング形式でデータをクライアントサイドに送信
     return StreamingResponse(generator(), headers=headers)
 
 

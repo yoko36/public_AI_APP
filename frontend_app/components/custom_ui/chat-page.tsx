@@ -16,7 +16,6 @@ import { AppRail } from "@/components/custom_ui/app-rail";
 // 状態管理
 import { useStore, Message } from "@/store/state"
 
-
 export default function ChatPage({ threadId }: { threadId: string }) {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
@@ -35,6 +34,12 @@ export default function ChatPage({ threadId }: { threadId: string }) {
     );
     const createMessage = useStore((s) => s.createMessage);
     const selectThread = useStore((s) => s.selectThread);
+    
+    // 終了の合図の判定を行う関数
+    const isTerminalToken = (s: string) => {    
+        const t = s.trim();
+        return t === "[DONE]" || t.toLowerCase() === "done" || t.toLowerCase() === "end";   
+    };
 
     // 表示中のスレッドを設定(プロジェクトも同様)
     useEffect(() => {
@@ -54,7 +59,7 @@ export default function ChatPage({ threadId }: { threadId: string }) {
         // inputの空文字を削除
         const content = input.trim();
         if (!content || !threadId) return;
-        
+
         // 入力を削除し、ローディング中の設定
         setInput("");
         setLoading(true);
@@ -63,7 +68,7 @@ export default function ChatPage({ threadId }: { threadId: string }) {
         useStore.getState().createMessage(content, threadId, "user");
 
         // 履歴は「assistant下書き」を作る前に生成（空assistantが混ざらない）
-        {   
+        {
             // ThreadIdからMessage集合(history)を取得(ThreadId -> MessageIdテーブル -> history)
             const s = useStore.getState();
             const ids = s.messageIdsByThreadId[threadId] ?? [];
@@ -95,7 +100,7 @@ export default function ChatPage({ threadId }: { threadId: string }) {
                 },
                 body: JSON.stringify({ threadId, messages: history }),  // JSON形式で送信
                 signal: controller.signal,                              // これを入れると進行中のSSEを即座に中断できる(controller.abort()を呼ぶ)
-                cache: "no-store", 
+                cache: "no-store",
             });
 
             console.log("[SSE] status:", res.status, "ct:", res.headers.get("content-type"));
@@ -147,19 +152,24 @@ export default function ChatPage({ threadId }: { threadId: string }) {
                         try {
                             const msg = JSON.parse(payload);        // JSONとして解釈させる
                             // メッセージタイプがチャンクかつメッセージの差分が文字列である場合に
-                            if (msg.type === "chunk" && typeof msg.delta === "string") {   
+                            if (msg.type === "chunk" && typeof msg.delta === "string") {
                                 draft += msg.delta;                 // メッセージ全体に差分を追加
                                 const id = draftIdRef.current;      // 保存しておいた仮のIDを取得
                                 if (id) useStore.getState().updateMessage(id, draft);   // zustandの状態を最新のメッセージに更新(threadIdで指定したスレッドのメッセージを更新)
-                            // 受信終了
+                                // 受信終了
                             } else if (msg.type === "end") {
                                 console.log("[SSE] end 受信");
-                            // エラーハンドリング
+                                // エラーハンドリング
                             } else if (msg.type === "error") {
                                 console.error("[SSE] server error:", msg.message);
                                 throw new Error(String(msg.message || "server error"));
                             }
                         } catch {
+                            // ③ 終了を表すデータを受け取った場合終了する
+                            if (isTerminalToken(payload)) {
+                                // 終了トークンは無視して本文に追加しない
+                                continue;
+                            }
                             // data行がJSON形式ではないデータだった場合(文字列が来たときなど)
                             draft += payload;                                       // テキストをそのままメッセージに差分として追加
                             const id = draftIdRef.current;                          // JSONの場合と同様
@@ -177,7 +187,7 @@ export default function ChatPage({ threadId }: { threadId: string }) {
             if (id && s.messagesById[id]) s.updateMessage(id, msg);
             else /* s.createMessage(msg, threadId, "assistant"); */ { }
         } finally {
-            // 通信の最後に
+            // 通信の最後に後始末を行う
             try { controller.abort(); } catch { }   // 通信を即座に終了させる
             controllerRef.current = null;           // 強制終了機能は通信ごとに用意するので、古いものは削除
             draftIdRef.current = null;              // ストリーミング形式でメッセージを作成する際に使用した下書きを削除

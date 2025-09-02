@@ -2,19 +2,19 @@
 
 import { useState, useRef, useEffect, useMemo } from "react";
 // shadcn UI
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-// lucide icon
-import { Plus, SendHorizonal } from "lucide-react";
 
 // custom UI
 import { Sidebar } from "@/components/custom_ui/sidebar";
 import { MarkdownMessage } from "@/components/custom_ui/markdown-message";
 import { AppRail } from "@/components/custom_ui/app-rail";
+import { PendingAttachmentBar } from "@/components/custom_ui/PendingAttachmentBar";
+import { Composer } from "@/components/custom_ui/composer";
 
 // 状態管理
-import { useStore, Message } from "@/store/state"
+import { useStore, Message } from "@/store/state"           // ユーザ、プロジェクト、スレッド、メッセージのデータ
+import { useAttachmentStore } from "@/store/attachments";   // 送信予定ファイルの一時データ
+
 
 export default function ChatPage({ threadId }: { threadId: string }) {
     const [input, setInput] = useState("");
@@ -34,11 +34,11 @@ export default function ChatPage({ threadId }: { threadId: string }) {
     );
     const createMessage = useStore((s) => s.createMessage);
     const selectThread = useStore((s) => s.selectThread);
-    
+
     // 終了の合図の判定を行う関数
-    const isTerminalToken = (s: string) => {    
+    const isTerminalToken = (s: string) => {
         const t = s.trim();
-        return t === "[DONE]" || t.toLowerCase() === "done" || t.toLowerCase() === "end";   
+        return t === "[DONE]" || t.toLowerCase() === "done" || t.toLowerCase() === "end";
     };
 
     // 表示中のスレッドを設定(プロジェクトも同様)
@@ -188,29 +188,14 @@ export default function ChatPage({ threadId }: { threadId: string }) {
             else /* s.createMessage(msg, threadId, "assistant"); */ { }
         } finally {
             // 通信の最後に後始末を行う
-            try { controller.abort(); } catch { }   // 通信を即座に終了させる
-            controllerRef.current = null;           // 強制終了機能は通信ごとに用意するので、古いものは削除
-            draftIdRef.current = null;              // ストリーミング形式でメッセージを作成する際に使用した下書きを削除
-            setLoading(false);                      // 通信終了
+            useAttachmentStore.getState().clearAll();   // 一時ファイルのバッファを初期化
+            try { controller.abort(); } catch { }       // 通信を即座に終了させる
+            controllerRef.current = null;               // 強制終了機能は通信ごとに用意するので、古いものは削除
+            draftIdRef.current = null;                  // ストリーミング形式でメッセージを作成する際に使用した下書きを削除
+            setLoading(false);                          // 通信終了
         }
 
     };
-
-    // ファイルをアップロードする関数
-    // const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const file = e.target.files?.[0];
-    //     if (!file) return;
-
-    //     // アップロード処理（例：サーバへPOST、画像表示など）
-    //     console.log("アップロードされたファイル:", file);
-
-    //     // メッセージ欄に仮表示してみる（必要に応じて変更）
-    //     setMessages((prev) => [
-    //         ...prev,
-    //         { role: "user", content: ` ファイルをアップロードしました: ${file.name}` },
-    //     ]);
-    // };
-
 
     return (
         <div className="flex h-screen w-full bg-muted/40">
@@ -262,62 +247,12 @@ export default function ChatPage({ threadId }: { threadId: string }) {
                         </div>
                         {/* フッター要素 */}
                         <div className="sticky bottom-3 z-50">
+                            {/* ファイル追加時の一時表示バー */}
+                            <PendingAttachmentBar />
                             <div className="mx-auto w-[min(100%,48rem)] px-3">
                                 <div className="rounded-2xl bg-background/90 backdrop-blur shadow-lg">
-                                    <div className="flex items-center justify-center gap-4 p-3 sm:p-4">
-                                        {/* 画像/ファイルアップロード用ボタン */}
-                                        <div className="relative">
-                                            <input
-                                                type="file"
-                                                accept="image/*,application/pdf"
-                                                // onChange={handleFileUpload}
-                                                className="absolute inset-0 opacity-0 cursor-pointer"
-                                            />
-                                            <Button size="icon" className="rounded-full w-14 h-14 shrink-0">
-                                                <Plus className="w-7 h-7" />
-                                            </Button>
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className=" shadow rounded-3xl bg-background overflow-hidden">
-                                                <Textarea
-                                                    placeholder="質問してみよう"
-                                                    value={input}
-                                                    onChange={(e) => setInput(e.target.value)}
-                                                    onInput={(e) => {
-                                                        const el = e.currentTarget;
-                                                        el.style.height = "auto";
-                                                        el.style.height = `${el.scrollHeight}px`;
-                                                    }}
-                                                    onKeyDown={(e) => {
-                                                        // IME変換中のEnterは無視
-                                                        if ((e as any).isComposing) return;
-                                                        if (e.key === "Enter" && !e.shiftKey) {
-                                                            e.preventDefault();  // textareaの改行を抑止
-                                                            handleSend();
-                                                        }
-                                                    }}
-                                                    disabled={loading}
-                                                    rows={1}
-                                                    className={[
-                                                        "w-full min-h-12 max-h-64 text-base leading-5",
-                                                        "px-4 py-3.5",
-                                                        "bg-transparent border-0 rounded-none shadow-none",
-                                                        "resize-none overflow-auto",
-                                                    ].join(" ")}
-                                                />
-                                            </div>
-                                        </div>
-                                        <Button
-                                            onClick={handleSend}
-                                            disabled={loading || !input.trim()}
-                                            size="icon"
-                                            variant="default"
-                                            aria-label="送信"
-                                            className="h-12 w-12 rounded-full shrink-0 bg-blue-600 hover:bg-blue-700 text-white"
-                                        >
-                                            <SendHorizonal className="w-6 h-6" />
-                                        </Button>
-                                    </div>
+                                    {/* 送信時のメインコンポーネント */}
+                                    <Composer input={input} setInput={setInput} onSend={handleSend} />
                                 </div>
                             </div>
                         </div>

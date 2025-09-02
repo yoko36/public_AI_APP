@@ -1,4 +1,4 @@
-export const runtime = "nodejs";            // Nodeランタイムでストリーミング
+export const runtime = "nodejs"; // Nodeランタイムでストリーミング
 export const dynamic = "force-dynamic";
 
 // テスト用
@@ -15,11 +15,11 @@ export async function POST(req: Request) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Accept": "text/event-stream",
-      "Connection": "keep-alive",
+      Accept: "text/event-stream",
+      Connection: "keep-alive",
       "Cache-Control": "no-cache",
     },
-    body: req.body as any,  // ← ボディをストリーム転送
+    body: req.body as any, // ← ボディをストリーム転送
     // @ts-expect-error: Undici 拡張。Nodeの fetch でストリーム送信時は必須
     duplex: "half",
   });
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
-      "Connection": "keep-alive",
+      Connection: "keep-alive",
     },
   });
 }

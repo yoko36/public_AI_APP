@@ -1,3 +1,4 @@
+// チャットシステムに関するストア状態の定義
 "use client"
 
 import { create } from "zustand"

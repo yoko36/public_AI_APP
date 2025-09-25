@@ -1,10 +1,22 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import { Plus } from "lucide-react";
 
-export function NewModal({ className, onCreate, buttonName, isOverviewNeeded }: { className?: string, onCreate: (name: string, overview?: string) => void, buttonName: string, isOverviewNeeded: boolean }) {
+export function NewModal({
+  className,
+  onCreate,
+  buttonName,
+  isOverviewNeeded,
+  icon,
+}: {
+  className?: string
+  onCreate: (name: string, overview?: string) => void
+  buttonName: string
+  isOverviewNeeded: boolean
+  icon?: ReactNode
+}) {    
     const [projectName, setProjectName] = useState("")
     const [overview, setOverview] = useState("")
     const [open, setOpen] = useState(false) // ← モーダル開閉状態
@@ -25,7 +37,7 @@ export function NewModal({ className, onCreate, buttonName, isOverviewNeeded }: 
                     variant="secondary"
                     className={`w-full justify-start gap-2 ${className ?? "text-xl"}`}
                 >
-                    <Plus className="w-5 h-5" />
+                    {icon ?? <Plus className="w-5 h-5" />}
                     {buttonName}
                 </Button>
             </DialogTrigger>

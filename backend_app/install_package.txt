@@ -14,8 +14,13 @@ langchain-openai
 langgraph
 requests
 
-fastapi 
+fastapi
 uvicorn
 
 slack_bolt
 slack_sdk
+
+python-dotenv==1.0.1
+httpx==0.27.2
+pydantic
+pydantic[email]>=2.7

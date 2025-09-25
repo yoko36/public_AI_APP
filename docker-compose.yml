@@ -4,6 +4,7 @@ services:
       context: ./backend_app
     container_name: chatbot_container
     env_file:
+      - ./backend_app/.env
       - .env
     volumes:
       - ./backend_app/app:/app
@@ -13,6 +14,7 @@ services:
     tty: true
     ports:
       - "8000:8000"
+    networks: [app_net]
 
   interface:
     build:
@@ -28,3 +30,9 @@ services:
     tty: true
     ports:
       - "3000:3000"
+    networks: [app_net]
+
+networks:
+  app_net:
+    name: app_net
+    driver: bridge

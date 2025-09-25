@@ -55,9 +55,9 @@ export function AppRail() {
   const goHome = () => push(`/`);
   const goChat = () => {
     if (selectedThreadId) {
-      push(`/chat-page/${encodeURIComponent(selectedThreadId)}`);
+      push(`/chat/${encodeURIComponent(selectedThreadId)}`);
     } else {
-      push(`/chat-page/placeholder`);
+      push(`/chat/placeholder`);
     }
   };
   const goFiles = () => push(`/files`);
@@ -74,7 +74,7 @@ export function AppRail() {
       <aside className="sticky top-0 h-screen w-16 shrink-0 border-r bg-background/95 backdrop-blur flex flex-col items-center justify-between py-4">
         <div className="flex flex-col items-center gap-2">
           <RailItem label="トップページ" icon={Home} onClick={goHome} active={isActive("/")} />
-          <RailItem label="チャット" icon={MessageSquare} onClick={goChat} active={isActive("/chat-page")} />
+          <RailItem label="チャット" icon={MessageSquare} onClick={goChat} active={isActive("/chat")} />
           <RailItem label="画像・ファイル" icon={FolderOpen} onClick={goFiles} active={isActive("/files")} />
           <RailItem label="カスタム関数" icon={Code2} onClick={goFunctions} active={isActive("/functions")} />
           <RailItem label="チャット履歴" icon={History} onClick={goHistory} active={isActive("/history")} />

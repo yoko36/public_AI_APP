@@ -16,7 +16,7 @@ export async function uploadPendingAttachments(): Promise<Attachment[]> {
             fd.append("file", p.file, p.name);  // フォームデータを追加
 
             // 指定したエンドポイントへPOSTメソッドを送りレスポンス(添付データの情報を含むデータ)を取得
-            const res = await fetch("/api-route/upload", { method: "POST", body: fd });
+            const res = await fetch("/api/upload", { method: "POST", body: fd });
             if (!res.ok) throw new Error(await res.text());
 
             // サーバからのデータをJSON形式に変換し、ファイルの保存先URLを取得

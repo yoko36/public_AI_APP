@@ -426,3 +426,232 @@ export const useStore = create<State & Actions>()(devtools((set, get) => ({
         }),
 }), { name: "app-store" })  // devtoolsのオプションで開発者ツールでの名前を設定する
 );
+
+
+// "use client";
+
+// import { create } from "zustand";
+// import { devtools } from "zustand/middleware";
+// import type { User, Project, Thread, Message } from "@/types/chat-app";
+
+// export const EMPTY_IDS: ReadonlyArray<string> = Object.freeze([]);
+// export const EMPTY_PROJECTS: ReadonlyArray<Project> = Object.freeze([]);
+// export const EMPTY_THREADS: ReadonlyArray<Thread> = Object.freeze([]);
+// export const EMPTY_MESSAGES: ReadonlyArray<Message> = Object.freeze([]);
+
+// /**
+//  * ストアは「正規化キャッシュ + 選択状態」に限定し、副作用を持たない。
+//  * - DB書き込みはフック（useProjects/Threads/Messages）だけが行う。
+//  * - ここは純粋な setState のみを提供。
+//  */
+
+// type State = {
+//   // 正規化キャッシュ
+//   usersById: Record<string, User>;
+
+//   projectsById: Record<string, Project>;
+//   projectIdsByUserId: Record<string, string[]>;
+
+//   threadsById: Record<string, Thread>;
+//   threadIdsByProjectId: Record<string, string[]>;
+
+//   messagesById: Record<string, Message>;
+//   messageIdsByThreadId: Record<string, string[]>;
+
+//   // UI選択状態
+//   selectedProjectId?: string;
+//   selectedThreadId?: string;
+// };
+
+// type Actions = {
+//   // 初期化
+//   resetAll: () => void;
+
+//   // -------- Projects --------
+//   bulkUpsertProjects: (rows: Project[]) => void;
+//   linkProjectIdsToUser: (userId: string, ids: string[]) => void;
+//   removeProjectCascade: (projectId: string) => void;
+
+//   // -------- Threads --------
+//   bulkUpsertThreads: (rows: Thread[]) => void;
+//   linkThreadIdsToProject: (projectId: string, ids: string[]) => void;
+//   removeThreadCascade: (threadId: string, projectIdHint?: string) => void;
+
+//   // -------- Messages --------
+//   bulkUpsertMessages: (rows: Message[]) => void;
+//   linkMessageIdsToThread: (threadId: string, ids: string[]) => void;
+//   removeMessage: (messageId: string) => void;
+
+//   // -------- Selection --------
+//   selectProject: (projectId?: string) => void;
+//   selectThread: (threadId?: string) => void;
+// };
+
+// const initial: State = {
+//   usersById: {},
+
+//   projectsById: {},
+//   projectIdsByUserId: {},
+
+//   threadsById: {},
+//   threadIdsByProjectId: {},
+
+//   messagesById: {},
+//   messageIdsByThreadId: {},
+
+//   selectedProjectId: undefined,
+//   selectedThreadId: undefined,
+// };
+
+// export const useStore = create<State & Actions>()(
+//   devtools(
+//     (set, get) => ({
+//       ...initial,
+
+//       resetAll: () => set({ ...initial }),
+
+//       // ===== Projects =====
+//       bulkUpsertProjects: (rows) =>
+//         set((s) => {
+//           const next = { ...s.projectsById };
+//           for (const p of rows) next[String((p as any).id)] = p;
+//           return { projectsById: next };
+//         }),
+
+//       linkProjectIdsToUser: (userId, ids) =>
+//         set((s) => ({
+//           projectIdsByUserId: { ...s.projectIdsByUserId, [userId]: [...ids] },
+//         })),
+
+//       removeProjectCascade: (projectId) =>
+//         set((s) => {
+//           if (!s.projectsById[projectId]) return s;
+
+//           // 1) プロジェクト削除
+//           const nextProjectsById = { ...s.projectsById };
+//           const p = nextProjectsById[projectId];
+//           delete nextProjectsById[projectId];
+
+//           // 2) user ←→ projects 紐付けから除去
+//           const nextProjectIdsByUserId = { ...s.projectIdsByUserId };
+//           if (p?.userId) {
+//             const ids = nextProjectIdsByUserId[p.userId] ?? EMPTY_IDS;
+//             nextProjectIdsByUserId[p.userId] = ids.filter((x) => x !== projectId);
+//           }
+
+//           // 3) 配下スレッド＆メッセージも削除
+//           const tids = s.threadIdsByProjectId[projectId] ?? EMPTY_IDS;
+//           const nextThreadsById = { ...s.threadsById };
+//           const nextThreadIdsByProjectId = { ...s.threadIdsByProjectId };
+//           const nextMessagesById = { ...s.messagesById };
+//           const nextMessageIdsByThreadId = { ...s.messageIdsByThreadId };
+
+//           for (const tid of tids) {
+//             const mids = s.messageIdsByThreadId[tid] ?? EMPTY_IDS;
+//             for (const mid of mids) delete nextMessagesById[mid];
+//             delete nextMessageIdsByThreadId[tid];
+//             delete nextThreadsById[tid];
+//           }
+//           delete nextThreadIdsByProjectId[projectId];
+
+//           const nextSelectedProjectId = s.selectedProjectId === projectId ? undefined : s.selectedProjectId;
+//           const nextSelectedThreadId = s.selectedThreadId && tids.includes(s.selectedThreadId) ? undefined : s.selectedThreadId;
+
+//           return {
+//             projectsById: nextProjectsById,
+//             projectIdsByUserId: nextProjectIdsByUserId,
+//             threadsById: nextThreadsById,
+//             threadIdsByProjectId: nextThreadIdsByProjectId,
+//             messagesById: nextMessagesById,
+//             messageIdsByThreadId: nextMessageIdsByThreadId,
+//             selectedProjectId: nextSelectedProjectId,
+//             selectedThreadId: nextSelectedThreadId,
+//           };
+//         }),
+
+//       // ===== Threads =====
+//       bulkUpsertThreads: (rows) =>
+//         set((s) => {
+//           const next = { ...s.threadsById };
+//           for (const t of rows) next[String((t as any).id)] = t;
+//           return { threadsById: next };
+//         }),
+
+//       linkThreadIdsToProject: (projectId, ids) =>
+//         set((s) => ({
+//           threadIdsByProjectId: { ...s.threadIdsByProjectId, [projectId]: [...ids] },
+//         })),
+
+//       removeThreadCascade: (threadId, projectIdHint) =>
+//         set((s) => {
+//           const t = s.threadsById[threadId];
+//           if (!t) return s;
+//           const pid = projectIdHint ?? t.projectId;
+
+//           const nextThreadsById = { ...s.threadsById };
+//           delete nextThreadsById[threadId];
+
+//           const nextThreadIdsByProjectId = { ...s.threadIdsByProjectId };
+//           const cur = nextThreadIdsByProjectId[pid] ?? EMPTY_IDS;
+//           nextThreadIdsByProjectId[pid] = cur.filter((x) => x !== threadId);
+
+//           const nextMessagesById = { ...s.messagesById };
+//           const nextMessageIdsByThreadId = { ...s.messageIdsByThreadId };
+//           const mids = s.messageIdsByThreadId[threadId] ?? EMPTY_IDS;
+//           for (const mid of mids) delete nextMessagesById[mid];
+//           delete nextMessageIdsByThreadId[threadId];
+
+//           const nextSelectedThreadId = s.selectedThreadId === threadId ? undefined : s.selectedThreadId;
+
+//           return {
+//             threadsById: nextThreadsById,
+//             threadIdsByProjectId: nextThreadIdsByProjectId,
+//             messagesById: nextMessagesById,
+//             messageIdsByThreadId: nextMessageIdsByThreadId,
+//             selectedThreadId: nextSelectedThreadId,
+//             selectedProjectId: s.selectedProjectId ?? pid,
+//           };
+//         }),
+
+//       // ===== Messages =====
+//       bulkUpsertMessages: (rows) =>
+//         set((s) => {
+//           const next = { ...s.messagesById };
+//           for (const m of rows) next[String((m as any).id)] = m;
+//           return { messagesById: next };
+//         }),
+
+//       linkMessageIdsToThread: (threadId, ids) =>
+//         set((s) => ({
+//           messageIdsByThreadId: { ...s.messageIdsByThreadId, [threadId]: [...ids] },
+//         })),
+
+//       removeMessage: (messageId) =>
+//         set((s) => {
+//           const m = s.messagesById[messageId];
+//           if (!m) return s;
+//           const tid = m.threadId;
+
+//           const nextMessagesById = { ...s.messagesById };
+//           delete nextMessagesById[messageId];
+
+//           const cur = s.messageIdsByThreadId[tid] ?? EMPTY_IDS;
+//           return {
+//             messagesById: nextMessagesById,
+//             messageIdsByThreadId: { ...s.messageIdsByThreadId, [tid]: cur.filter((x) => x !== messageId) },
+//           };
+//         }),
+
+//       // ===== Selection =====
+//       selectProject: (projectId) => set(() => ({ selectedProjectId: projectId })),
+//       selectThread: (threadId) => set((s) => {
+//         const pid = threadId ? s.threadsById[threadId]?.projectId : undefined;
+//         return {
+//           selectedThreadId: threadId,
+//           selectedProjectId: pid ?? s.selectedProjectId,
+//         };
+//       }),
+//     }),
+//     { name: "app-store" }
+//   )
+// );

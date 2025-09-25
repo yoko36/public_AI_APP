@@ -1,0 +1,13 @@
+volumes/db/data
+volumes/storage
+.env
+test.http
+docker-compose.override.yml
+
+# 開発用の一時ファイルやキャッシュ
+*.log
+*.tmp
+# ランタイムログ
+volumes/logs/
+# ストレージのスタブ
+volumes/storage/stub

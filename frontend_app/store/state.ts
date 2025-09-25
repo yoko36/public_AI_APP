@@ -4,42 +4,14 @@
 import { create } from "zustand"
 import { devtools } from "zustand/middleware"
 
+// 型定義取得
+import { User, Project, Thread, Message } from "@/types/chat-app"
+
 // レンダリングのタイミングで異なるデータを読み込むことによる無限ループ(恐れ)を防ぐために定義
 // Reactでは「const projects = useStore(s => s.projects[userId] ?? []);」のようなコードは"[]"を新規作成する扱いになる
 export const EMPTY_PROJECTS: ReadonlyArray<Project> = Object.freeze([]);
 export const EMPTY_THREADS: ReadonlyArray<Thread> = Object.freeze([]);
 export const EMPTY_MESSAGES: ReadonlyArray<Message> = Object.freeze([]);
-
-export type User = {
-    id: string;
-    name: string;
-    updated_at: string;
-}
-
-export type Project = {
-    id: string;
-    name: string;
-    userId: string;
-    overview?: string;
-    created_at: string
-    updated_at: string
-}
-
-export type Thread = {
-    id: string;
-    name: string;
-    projectId: string;
-    created_at: string;
-    updated_at: string;
-}
-
-export type Message = {
-    id: string;
-    content: string;
-    threadId: string;
-    role: "user" | "assistant";
-    created_at: string
-}
 
 type State = {
     usersById: Record<string, User>            // key: userId => value: User

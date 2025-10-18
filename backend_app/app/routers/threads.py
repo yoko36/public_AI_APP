@@ -31,13 +31,13 @@ class ThreadUpdate(BaseModel):
 
 @router.get("", include_in_schema=False)
 async def list_threads(
-    projectId: str = Query(..., alias="projectId"),  # 取得先のプロジェクトを指定
+    project_id: str = Query(..., alias="projectId"),  # 取得先のプロジェクトを指定
     token: str = Depends(bearer_token),
 ):
     client = SupaRest(token)
     params = {
         "select": "id,name,project_id,created_at,updated_at",
-        "project_id": f"eq.{projectId}",
+        "project_id": f"eq.{project_id}",
         "order": "created_at.asc",
     }
     try:

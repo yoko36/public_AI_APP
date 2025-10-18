@@ -19,6 +19,8 @@ import { useAttachmentStore } from "@/store/attachments";       // 送信予定�
 // --- 変更後：DB保存用フックを追加 ---
 // ユーザ発言をまずDBへ保存（/api/v1/messages 経由）するために利用
 import { useMessages } from "@/hooks/useMessages";              // データベースとzustandの状態を同期させる
+// ファイル送信機能
+import { uploadPendingAttachments } from "@/lib/upload"
 
 export default function ChatPage({ threadId }: { threadId: string }) {
   const [input, setInput] = useState("");
@@ -121,7 +123,16 @@ export default function ChatPage({ threadId }: { threadId: string }) {
     setInput("");
     setLoading(true);
 
-    // --- 変更後：まずDBへ保存（useMessages.sendMessage）---
+    // ファイルの送信をメッセージの送信より前に行い、ファイルの保存先IDを取得しておく
+    let attachmentIds: string[] = [];
+    try {
+      const uploaded = await uploadPendingAttachments(threadId);
+      attachmentIds = uploaded.map((a: any) => a.id).filter(Boolean);
+    } catch (e) {
+      console.error("[uploadPendingAttachments] failed:", e);
+      // （続行しても良いし、中断しても良い。ここでは続行）
+    }
+
     // - sendMessage は「楽観挿入→サーバ確定IDに差し替え」まで面倒を見てくれる
     // - これにより“DB先書き”が保証され、SSEや再接続時も整合しやすい
     let createdUserMessage: Message | undefined;
@@ -151,9 +162,9 @@ export default function ChatPage({ threadId }: { threadId: string }) {
     // (補足:) 送信中であることがわかりやすいように、ボットの返信を先に作り「返信中と表示」
     {
       const s = useStore.getState();
-      const nextId = String(s.messageCounter);                   // 次に発番されるIDを先取り
+      const nextId = String(s.messageCounter);                   // 次に発行されるIDを先取り
       s.createMessage("送信中", threadId, "assistant");          // 送信中というメッセージを持った仮の返答文
-      draftIdRef.current = nextId;                               // ← catch文からでも読めるように保持
+      draftIdRef.current = nextId;                               // catch文からでも読めるように保持
     }
 
     // SSE(Server Sent Events) 開始
@@ -175,8 +186,8 @@ export default function ChatPage({ threadId }: { threadId: string }) {
         credentials: "include",
         body: JSON.stringify({
           threadId,
-          messages: history,                    // 既存の履歴
-          // hintUserMessageId: createdUserMessage?.id, // ← サーバが冪等確認に使うなら
+          messages: history,      // 既存の履歴
+          attachmentIds           // ファイルの保存先ID
         }),
         signal: controller.signal,
         cache: "no-store",

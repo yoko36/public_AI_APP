@@ -5,7 +5,19 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { AppRail } from "@/components/custom_ui/app-rail";
 import { useStore } from "@/store/state";
-import { MessageSquare, FolderOpen, Code2, History, FileText, User } from "lucide-react";
+import { 
+  MessageSquare, 
+  FolderOpen, 
+  Code2, 
+  History, 
+  FileText, 
+  User,
+  Package,
+  GraduationCap,
+  BookOpen,
+  Newspaper,
+  Bookmark,
+ } from "lucide-react";
 
 const appName = "agent";
 
@@ -34,6 +46,11 @@ export default function StartPage() {
       { label: "履歴", icon: History, onClick: () => push("/history") },
       { label: "論文推敲", icon: FileText, onClick: () => push("/paper") },
       { label: "ユーザ管理", icon: User, onClick: () => push("/admin") },
+      { label: "ストア", icon: Package, onClick: () => push("/store") },
+      { label: "チュートリアル", icon: GraduationCap, onClick: () => push("/tutorial") },
+      { label: "論文リーダー", icon: BookOpen, onClick: () => push("/reader") },
+      { label: "技術ニュース", icon: Newspaper, onClick: () => push("/news") },
+      { label: "リファレンス", icon: Bookmark, onClick: () => push("/reference") },
     ],
     [selectedThreadId]
   );

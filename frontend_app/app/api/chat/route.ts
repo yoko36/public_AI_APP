@@ -10,6 +10,8 @@ export async function POST(req: Request) {
   const backend = process.env.BACKEND_INTERNAL_URL;
   const url = `${backend}/api/v1/chatbot`;
   const cookie = req.headers.get("cookie") || "";// Cookieの取得
+  // JSON データを JS のオブジェクトにする
+  const payload = await req.json();
 
   // クライアントのリクエストボディをそのままバックエンドへ
   const res = await fetch(url, {
@@ -21,8 +23,8 @@ export async function POST(req: Request) {
       Cookie: cookie,
       "Cache-Control": "no-cache",
     },
-    body: req.body as any, // ← ボディをストリーム転送
-    // @ts-expect-error: Undici 拡張。Nodeの fetch でストリーム送信時は必須
+    body: JSON.stringify(payload),
+     // @ts-expect-error: Undici 拡張。Nodeの fetch でストリーム送信時は必須
     duplex: "half",
   });
 

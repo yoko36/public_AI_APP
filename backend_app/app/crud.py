@@ -1,11 +1,3 @@
-# crud.py
-# ------------------------------------------------------------
-# PostgREST を叩く薄いクライアント。
-# ・ユーザーのアクセストークン（JWT） or Service Role Key を Authorization に付与
-# ・常に "app" スキーマで読み書き（Accept-Profile / Content-Profile）
-# ・PostgREST の 4xx/5xx は FastAPI の HTTPException に変換（500を避け、原因が見える）
-# ------------------------------------------------------------
-
 import os
 from typing import Any, Dict, Optional
 import httpx
@@ -26,7 +18,7 @@ class SupaRest:
     """
     PostgREST を使いやすくするためのヘルパ関数
     - ユーザーの access_token を Authorization に付与して RLS を効かせる
-    - 公開スキーマが複数ある環境で複雑にならないよう、スキーマ「プロファイル」をヘッダで指定する
+    - 公開スキーマが複数ある環境で複雑にならないよう、スキーマ「プロファイル」をヘッダで指定する（スキーマは基本"app"）
       * 読み込み系:    Accept-Profile: <schema>
       * 書き込み/RPC:  Content-Profile: <schema>
     - 非 2xx は FastAPI の HTTPException に張り替える（エラーをわかりやすくするため）。
@@ -76,6 +68,22 @@ class SupaRest:
         merged.update(extra)
         return merged
 
+    # フィルタなどで使用する演算子クエリパラメータ（eq/ne/gt/lt/in/is）を PostgREST 形式に変換
+    def _build_filters(self, **conds: Any) -> dict[str, Any]:
+        qp: dict[str, Any] = {}
+        for col, spec in conds.items():
+            if isinstance(spec, tuple) and len(spec) == 2:
+                op, val = spec
+            else:
+                op, val = "eq", spec
+            if op == "in" and isinstance(val, (list, tuple, set)):
+                qp[col] = f"in.({','.join(map(str, val))})"
+            elif val is None:
+                qp[col] = "is.null" if op in ("is", "eq") else f"{op}.null"
+            else:
+                qp[col] = f"{op}.{val}"
+        return qp
+
     # ==================================================
     ## 内部共通：実際にpostgRESTにリクエストを送る処理を定義
     # ==================================================
@@ -91,6 +99,7 @@ class SupaRest:
     ):
         h = {**(headers or {})}  # ヘッダー(辞書型)をアンパック
         url = f"{REST_BASE}/{path.lstrip('/')}"  # URLを作成
+
         # クライアントライブラリ(httpx)内の非同期メソッドを使用して通信を行う
         async with httpx.AsyncClient(timeout=self._timeout) as client:
             r = await client.request(
@@ -112,7 +121,9 @@ class SupaRest:
         except ValueError:
             return r.text
 
-    # ---- CRUD / RPC の公開メソッド ----
+    # ==================================================
+    ## CRUD / RPC の公開メソッド
+    # ==================================================
 
     # データの取得(Read)
     async def get(
@@ -245,3 +256,23 @@ class SupaRest:
         return await self._request(
             "POST", f"rpc/{fn}", headers=h, json=(args or {})
         )  # POSTメソッドでストアド関数を呼び出す
+
+    # １要素のみを取得するGETメソッド（GETメソッドは一覧を取得）
+    async def get_one(
+        self,
+        path: str,
+        *,
+        select: str = "*",
+        accept_profile: str | None = None,
+        **filters: Any,  # 例: id=("eq", <uuid>) / id=<uuid>
+    ):
+        qp = {"select": select, "limit": 1}
+        qp.update(self._build_filters(**filters))
+        h = self._merge_headers(self._headers_get, None)
+        if accept_profile:
+            h["Accept-Profile"] = accept_profile
+        resp = await self._request("GET", path, headers=h, params=qp)
+        if not resp:
+            return None
+        # PostgREST は配列で返す
+        return resp[0] if isinstance(resp, list) and resp else None

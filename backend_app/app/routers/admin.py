@@ -123,7 +123,7 @@ async def create_user(payload: CreateUserPayload, token: str = Depends(bearer_to
             json={
                 "email": payload.email,
                 "email_confirm": True,  # 招待フローにするなら False に
-                # "password": payload.password,  # 必要なら追加
+                # "password": "Password1234",
                 "user_metadata": {"name": payload.name},
                 "app_metadata": {"role": payload.role},  # 参考メタ（実権限はDB）
             },
